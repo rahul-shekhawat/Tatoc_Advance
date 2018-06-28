@@ -6,7 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import junit.framework.Assert;
 
 
 public class QueryGate {
@@ -18,20 +22,32 @@ public class QueryGate {
 		this.driver=driver;
 	}
 	
-	public void gettingcorrectcredentialsfromdatabase() throws SQLException, ClassNotFoundException
+	public void verifyingcorrectcredentials() throws SQLException, ClassNotFoundException
 	{	
-		//ResultSet resultSet = null;
+		String symbolname=driver.findElement(By.id("symboldisplay")).getAttribute("innerHTML");
 		Connection con = DriverManager.getConnection("jdbc:mysql://10.0.1.86/tatoc","tatocuser","tatoc01");
 		Class.forName("com.mysql.jdbc.Driver");
-		String query="select * from identity";
+		
+		String query="SELECT id FROM identity WHERE SYMBOL='"+symbolname+"'";
 		Statement stmt = con.createStatement();
 		ResultSet resultSet = stmt.executeQuery(query);
-		while (resultSet .next()) {
-			System.out.println(resultSet .getString(1));
-		}
-
+		resultSet.next();
+		String id=resultSet.getString(1);
+		
+		String query2="SELECT name,passkey FROM credentials WHERE id='"+id+"'";
+		ResultSet resultSet2 = stmt.executeQuery(query2);
+		resultSet2.next();
+		String name=resultSet2.getString(1);
+		String passkey=resultSet2.getString(2);
+		
 		con.close();
-
+		
+		driver.findElement(By.id("name")).sendKeys(name);
+		driver.findElement(By.id("passkey")).sendKeys(passkey);
+		driver.findElement(By.id("submit")).click();
+		
+		Assert.assertEquals("http://10.0.1.86/tatoc/advanced/video/player", driver.getCurrentUrl());
+		
 	}
 
 }
