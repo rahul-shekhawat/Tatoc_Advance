@@ -1,10 +1,13 @@
 package com.qait.automation.TatocAdvance;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -14,6 +17,8 @@ public class TestAll {
 	TatocHome home;
 	HoverMenu menu;
 	QueryGate gate;
+	Restful rest;
+	Download down;
 	
 	@Test(priority=0)
 	public void clickingonAdvanceCoursewillgotonextpage()
@@ -28,9 +33,23 @@ public class TestAll {
 	}
 	
 	@Test(priority=2)
-	public void func() throws ClassNotFoundException, SQLException
+	public void enteringcorrectcredentialswillrendernextpage() throws ClassNotFoundException, SQLException
 	{
 		gate.gettingcorrectcredentialsfromdatabase();
+	}
+	
+	@Test(priority=3)
+	public void succregisterservicewilldisplaynextpage() throws IOException, InterruptedException
+	{
+		String token=rest.sendGET();
+		rest.sendPOST(token);
+		
+	}
+	
+	@Test(priority=4)
+	public void successfulsigsubmitwilldisplaynextpage() throws IOException, InterruptedException
+	{
+		down.downloadnEnteringSig();
 	}
 	
 	@BeforeClass
@@ -42,6 +61,8 @@ public class TestAll {
 		home=new TatocHome(driver);
 		menu=new HoverMenu(driver);
 		gate=new QueryGate(driver);
+		rest=new Restful(driver);
+		down=new Download(driver);
 	}
 	
 	@AfterClass
@@ -50,4 +71,6 @@ public class TestAll {
 		Thread.sleep(2000);
 		driver.quit();
 	}
+	
+	
 }
